@@ -25,6 +25,7 @@ pipeline{
                     // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
                     reuseNode true 
                 }
+            }
             steps{
 
                 sh 'flyway -url=$DB_URL -user=$DB_CREDENTIALS_USR -password=$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql info' 
@@ -40,6 +41,7 @@ pipeline{
                     // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
                     reuseNode true 
                 }
+            }
             steps{
 
                 sh 'flyway -url=$DB_URL -user=$DB_CREDENTIALS_USR -password=$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql migrate'
@@ -48,6 +50,4 @@ pipeline{
         }
 
 
-    }
-}
 }
