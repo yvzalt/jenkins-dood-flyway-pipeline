@@ -24,7 +24,8 @@ pipeline{
                     image 'flyway/flyway:latest-alpine'
                     // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
                     reuseNode true
-                    args '--entrypoint=""' 
+                    args '--entrypoint=""'
+                    //Jenkins wants to use own entrypoint. 
                 }
             }
             steps{
