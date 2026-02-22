@@ -41,7 +41,7 @@ pipeline{
             steps{
 
                 sh 'flyway -url=$DB_URL -user=$DB_CREDENTIALS_USR -password=$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql migrate'
-
+                //Adding -executeInTransaction="false" parameter executes ALL SQL migrations non-transactionally.
             }
         }
 
