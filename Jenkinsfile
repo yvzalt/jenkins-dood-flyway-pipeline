@@ -23,7 +23,8 @@ pipeline{
                 docker {
                     image 'flyway/flyway:latest-alpine'
                     // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
-                    reuseNode true 
+                    reuseNode true
+                    args '--entrypoint=""' 
                 }
             }
             steps{
@@ -39,7 +40,8 @@ pipeline{
                 docker {
                     image 'flyway/flyway:latest-alpine'
                     // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
-                    reuseNode true 
+                    reuseNode true
+                    args '--entrypoint=""' 
                 }
             }
             steps{
