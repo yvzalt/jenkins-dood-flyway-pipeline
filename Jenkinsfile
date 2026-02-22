@@ -3,7 +3,7 @@ pipeline{
     agent any
 
     environment{
-        DB_URL = ''
+        DB_URL = 'jdbc:postgresql://192.168.56.11:5432/app_db'
 
         DB_CREDENTIALS = credentials('db-credentials-for-flyway')
         // Prerequisite: Go to Manage Jenkins -> Credentials, create a 'Username with password' credential and set its ID to 'db-credentials-for-flyway'.
@@ -14,7 +14,7 @@ pipeline{
         stage('Checkout'){
             
             steps{
-                git url: '', branch:'main'
+                git url: 'https://github.com/yvzalt/jenkins-dood-flyway-pipeline.git', branch:'main'
             }
         }
 
@@ -32,7 +32,7 @@ pipeline{
 
             }
         }
-        }
+        
 
         stage('Flyway Migrate'){
             agent {
@@ -48,6 +48,6 @@ pipeline{
                 //Adding -executeInTransaction="false" parameter executes ALL SQL migrations non-transactionally.
             }
         }
-
+    }
 
 }
