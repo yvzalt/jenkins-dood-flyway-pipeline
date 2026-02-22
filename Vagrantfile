@@ -27,6 +27,9 @@ Vagrant.configure("2") do |config|
         -v /var/jenkins_home:/var/jenkins_home \
         -v /var/run/docker.sock:/var/run/docker.sock \
         jenkins/jenkins:lts
+      sleep 30
+      docker exec jenkins apt-get update
+      docker exec jenkins apt-get install -y docker.io
     SHELL
   end
 
