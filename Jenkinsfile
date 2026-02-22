@@ -1,15 +1,6 @@
 pipeline{
 
-    agent{
-
-        docker{
-            image 'flyway/flyway:latest-alpine'
-
-            //args '-v /opt/flyway-sql:/flyway/sql'
-            // if you want to run scripts from path instead of git
-        }
-
-    }
+    agent any
 
     environment{
         DB_URL = ''
@@ -21,14 +12,19 @@ pipeline{
     stages{
 
         stage('Checkout'){
-
+            
             steps{
                 git url: '', branch:'main'
             }
         }
 
         stage('Flyway Info'){
-            
+            agent {
+                docker {
+                    image 'flyway/flyway:latest-alpine'
+                    // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
+                    reuseNode true 
+                }
             steps{
 
                 sh 'flyway -url=$DB_URL -user=$DB_CREDENTIALS_USR -password=$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql info' 
@@ -37,7 +33,12 @@ pipeline{
         }
 
         stage('Flyway Migrate'){
-
+            agent {
+                docker {
+                    image 'flyway/flyway:latest-alpine'
+                    // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
+                    reuseNode true 
+                }
             steps{
 
                 sh 'flyway -url=$DB_URL -user=$DB_CREDENTIALS_USR -password=$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql migrate'
