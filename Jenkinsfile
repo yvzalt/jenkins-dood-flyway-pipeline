@@ -31,6 +31,7 @@ pipeline{
 
             }
         }
+        }
 
         stage('Flyway Migrate'){
             agent {
@@ -48,4 +49,5 @@ pipeline{
 
 
     }
+}
 }
