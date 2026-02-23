@@ -2,6 +2,11 @@ pipeline{
 
     agent any
 
+    parameters{
+        choice(name: 'executeInTransaction', choices: ['true', 'false'], description: 'Execute all SQL migrations in a transaction block? (Select false for CONCURRENTLY index or VACUUM)')
+        booleanParam(name: 'runMigrations', defaultValue: true, description: 'Whether to run the Flyway migrations or not.')
+    }
+
     environment{
         DB_URL = 'jdbc:postgresql://192.168.56.11:5432/app_db'
 
@@ -22,8 +27,10 @@ pipeline{
             agent {
                 docker {
                     image 'flyway/flyway:latest-alpine'
-                    // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
+
+                    // Jenkins will reuse the same workspace and files from the previous stage
                     reuseNode true
+
                     args '--entrypoint=""'
                     //Jenkins wants to use own entrypoint. 
                 }
@@ -40,15 +47,27 @@ pipeline{
             agent {
                 docker {
                     image 'flyway/flyway:latest-alpine'
-                    // 3. Çok Kritik: Ana makineye inen kodların (workspace) konteynere bağlanmasını sağlar
+                    
+                    // Jenkins will reuse the same workspace and files from the previous stage
                     reuseNode true
+        
                     args '--entrypoint=""' 
+                    //Jenkins wants to use own entrypoint. 
                 }
             }
             steps{
 
-                sh 'flyway -url=$DB_URL -user=$DB_CREDENTIALS_USR -password=$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql migrate'
-                //Adding -executeInTransaction="false" parameter executes ALL SQL migrations non-transactionally.
+                script {
+                    if (params.runMigrations) {
+                        def executeInTransactionFlag = params.executeInTransaction.toBoolean() ? '' : '-executeInTransaction=false'
+                        sh "flyway -url=\$DB_URL -user=\$DB_CREDENTIALS_USR -password=\$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql ${executeInTransactionFlag} migrate"
+                        //Adding -executeInTransaction="false" parameter executes ALL SQL migrations non-transactionally.
+                    } else {
+                        echo 'Skipping Flyway migrations as runMigrations parameter is set to false.'
+                    }
+                }
+
+                
             }
         }
     }
