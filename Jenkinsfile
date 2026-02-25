@@ -4,6 +4,7 @@ pipeline{
 
     parameters{
         choice(name: 'executeInTransaction', choices: ['true', 'false'], description: 'Execute all SQL migrations in a transaction block? (Select false for CONCURRENTLY index or VACUUM)')
+        choice(name: 'baselineOnMigrate', choices: ['true', 'false'], description: 'Automatically baseline non-empty databases during migration. If enabled, Flyway creates a baseline marker (default baselineVersion: 1) to skip older scripts. Ideal for introducing Flyway to existing databases.')
         booleanParam(name: 'runMigrations', defaultValue: true, description: 'Whether to run the Flyway migrations or not.')
     }
 
@@ -60,7 +61,9 @@ pipeline{
                 script {
                     if (params.runMigrations) {
                         def executeInTransactionFlag = params.executeInTransaction.toBoolean() ? '' : '-executeInTransaction=false'
-                        sh "flyway -url=\$DB_URL -user=\$DB_CREDENTIALS_USR -password=\$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql ${executeInTransactionFlag} migrate"
+                        def baselineOnMigrateFlag = params.baselineOnMigrate.toBoolean() ? '-baselineOnMigrate=true' : ''
+
+                        sh "flyway -url=\$DB_URL -user=\$DB_CREDENTIALS_USR -password=\$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql ${executeInTransactionFlag} ${baselineOnMigrateFlag} migrate"
                         //Adding -executeInTransaction="false" parameter executes ALL SQL migrations non-transactionally.
                     } else {
                         echo 'Skipping Flyway migrations as runMigrations parameter is set to false.'
