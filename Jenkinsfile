@@ -65,6 +65,9 @@ pipeline{
 
                         sh "flyway -url=\$DB_URL -user=\$DB_CREDENTIALS_USR -password=\$DB_CREDENTIALS_PSW -schemas=app_schema -locations=filesystem:sql ${executeInTransactionFlag} ${baselineOnMigrateFlag} migrate"
                         //Adding -executeInTransaction="false" parameter executes ALL SQL migrations non-transactionally.
+
+                        // Note: If you set -baselineVersion=2, V2 becomes the baseline (the default is V1). Flyway will then skip older scripts and start executing from V3 onwards. Even if you remove this parameter later, Flyway will remember the baseline state thanks to the flyway_schema_history table, ensuring V1 is never executed.
+                        
                     } else {
                         echo 'Skipping Flyway migrations as runMigrations parameter is set to false.'
                     }
